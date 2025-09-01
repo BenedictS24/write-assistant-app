@@ -39,14 +39,14 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def validate_slider_values(data):
-    """Validate that all slider values are integers between 1-10"""
+    """Validate that all slider values are integers between 0-10"""
     required_params = ['faithfulness', 'human_like', 'ai_like', 'formality']
     
     for param in required_params:
         try:
             value = int(data.get(param, 0))
-            if not 1 <= value <= 10:
-                return False, f"{param} must be between 1 and 10"
+            if not 0 <= value <= 10:
+                return False, f"{param} must be between 0 and 10"
         except (ValueError, TypeError):
             return False, f"{param} must be a valid number"
     
@@ -61,33 +61,33 @@ def create_processing_prompt(text, faithfulness, human_like, ai_like, formality)
         f"\n**Faithfulness to Original (Level {faithfulness}/10):**"
     ]
     
-    if faithfulness <= 3:
+    if faithfulness <= 2:
         prompt_parts.append("Make significant changes and improvements to the content while preserving core meaning.")
-    elif faithfulness <= 6:
+    elif faithfulness <= 5:
         prompt_parts.append("Make moderate changes to improve clarity and flow while keeping most original content.")
     else:
         prompt_parts.append("Make minimal changes, focusing only on essential corrections and improvements.")
     
     prompt_parts.append(f"\n**Human-like Sound (Level {human_like}/10):**")
-    if human_like <= 3:
+    if human_like <= 2:
         prompt_parts.append("Use very natural, conversational language with contractions and casual expressions.")
-    elif human_like <= 6:
+    elif human_like <= 5:
         prompt_parts.append("Use moderately natural language that sounds human but polished.")
     else:
         prompt_parts.append("Use highly natural, warm, and engaging human language with personality.")
     
     prompt_parts.append(f"\n**AI-like Sound (Level {ai_like}/10):**")
-    if ai_like <= 3:
+    if ai_like <= 2:
         prompt_parts.append("Avoid any mechanical or robotic phrasing; sound completely human.")
-    elif ai_like <= 6:
+    elif ai_like <= 5:
         prompt_parts.append("Use some structured phrasing but maintain natural flow.")
     else:
         prompt_parts.append("Use precise, structured language that sounds more systematic and analytical.")
     
     prompt_parts.append(f"\n**Formality Level (Level {formality}/10):**")
-    if formality <= 3:
+    if formality <= 2:
         prompt_parts.append("Use very casual, informal language appropriate for friends or social media.")
-    elif formality <= 6:
+    elif formality <= 5:
         prompt_parts.append("Use moderately formal language suitable for business communication.")
     else:
         prompt_parts.append("Use highly formal, academic or professional language.")
@@ -163,9 +163,9 @@ def process_text():
         # Call OpenAI API
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": "You are a professional text editor and writer. Follow the given parameters precisely to modify the provided text."},
+                    {"role": "system", "content": "You are an expert writing coach and text editor with deep expertise in grammar, style, clarity, and tone. You excel at improving text while respecting the author's voice and intent. Follow the given parameters precisely to enhance the provided text with professional writing standards."},
                     {"role": "user", "content": processing_prompt}
                 ],
                 max_tokens=2000,
