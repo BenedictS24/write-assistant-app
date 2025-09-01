@@ -55,9 +55,8 @@ def validate_slider_values(data):
 def create_processing_prompt(text, faithfulness, human_like, ai_like, formality):
     """Create a detailed prompt for ChatGPT based on slider values"""
     
-    # Build prompt based on slider values
     prompt_parts = [
-        "Please process the following text according to these specific parameters:",
+        "Please process the following text according to these specific parameters. IMPORTANT: Detect the language of the input text and respond in the SAME language.",
         f"\n**Faithfulness to Original (Level {faithfulness}/10):**"
     ]
     
@@ -70,32 +69,32 @@ def create_processing_prompt(text, faithfulness, human_like, ai_like, formality)
     
     prompt_parts.append(f"\n**Human-like Sound (Level {human_like}/10):**")
     if human_like <= 2:
-        prompt_parts.append("Use very natural, conversational language with contractions and casual expressions.")
+        prompt_parts.append("Use very natural, conversational language appropriate for the detected language with contractions and casual expressions.")
     elif human_like <= 5:
-        prompt_parts.append("Use moderately natural language that sounds human but polished.")
+        prompt_parts.append("Use moderately natural language that sounds human but polished in the detected language.")
     else:
-        prompt_parts.append("Use highly natural, warm, and engaging human language with personality.")
+        prompt_parts.append("Use highly natural, warm, and engaging human language with personality in the detected language.")
     
     prompt_parts.append(f"\n**AI-like Sound (Level {ai_like}/10):**")
     if ai_like <= 2:
-        prompt_parts.append("Avoid any mechanical or robotic phrasing; sound completely human.")
+        prompt_parts.append("Avoid any mechanical or robotic phrasing; sound completely human in the detected language.")
     elif ai_like <= 5:
-        prompt_parts.append("Use some structured phrasing but maintain natural flow.")
+        prompt_parts.append("Use some structured phrasing but maintain natural flow in the detected language.")
     else:
-        prompt_parts.append("Use precise, structured language that sounds more systematic and analytical.")
+        prompt_parts.append("Use precise, structured language that sounds more systematic and analytical in the detected language.")
     
     prompt_parts.append(f"\n**Formality Level (Level {formality}/10):**")
     if formality <= 2:
-        prompt_parts.append("Use very casual, informal language appropriate for friends or social media.")
+        prompt_parts.append("Use very casual, informal language appropriate for friends or social media in the detected language.")
     elif formality <= 5:
-        prompt_parts.append("Use moderately formal language suitable for business communication.")
+        prompt_parts.append("Use moderately formal language suitable for business communication in the detected language.")
     else:
-        prompt_parts.append("Use highly formal, academic or professional language.")
+        prompt_parts.append("Use highly formal, academic or professional language in the detected language.")
     
     prompt_parts.extend([
         "\n**Text to process:**",
         f"\n{text}",
-        "\n**Instructions:** Apply the above parameters to rewrite this text. Return only the processed text without explanations."
+        "\n**Instructions:** Apply the above parameters to rewrite this text in the SAME language as the input. Maintain all cultural and linguistic nuances appropriate for that language. Return only the processed text without explanations."
     ])
     
     return "".join(prompt_parts)
@@ -165,7 +164,7 @@ def process_text():
             response = openai.ChatCompletion.create(
                 model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": "You are an expert writing coach and text editor with deep expertise in grammar, style, clarity, and tone. You excel at improving text while respecting the author's voice and intent. Follow the given parameters precisely to enhance the provided text with professional writing standards."},
+                    {"role": "system", "content": "You are an expert multilingual writing coach and text editor with deep expertise in grammar, style, clarity, and tone across all languages. You excel at improving text while respecting the author's voice, intent, and cultural context. You always respond in the same language as the input text and follow the given parameters precisely to enhance the provided text with professional writing standards appropriate for that language and culture."},
                     {"role": "user", "content": processing_prompt}
                 ],
                 max_tokens=2000,
